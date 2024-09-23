@@ -386,31 +386,14 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 			Label:       ad.Domain,
 		})
 
-		var dir = trust.TrustDirection
-		if dir == TrustDirectionInbound || dir == TrustDirectionBidirectional {
-			parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
-				IngestibleSource{
-					Source:     domain.ObjectIdentifier,
-					SourceType: ad.Domain,
-				},
-				IngestibleTarget{
-					Target:     trust.TargetDomainSid,
-					TargetType: ad.Domain,
-				},
-				IngestibleRel{
-					RelProps: map[string]any{
-						"isacl":                false,
-						"sidfiltering":         trust.SidFilteringEnabled,
-						"tgtdelegationenabled": trust.TGTDelegationEnabled,
-						"trustattributes":      finalTrustAttributes,
-						"trusttype":            trust.TrustType,
-						"transitive":           trust.IsTransitive},
-					RelType: ad.TrustedBy,
-				},
-			))
+		// Determine edge type
+		edgeType := ad.CrossForestTrust
+		if trust.TrustType == "ParentChild" || trust.TrustType == "TreeRoot" || trust.TrustType == "Shortcut" {
+			edgeType = ad.SameForestTrust
 		}
 
-		if dir == TrustDirectionOutbound || dir == TrustDirectionBidirectional {
+		var dir = trust.TrustDirection
+		if dir == TrustDirectionInbound || dir == TrustDirectionBidirectional {
 			parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
 				IngestibleSource{
 					Source:     trust.TargetDomainSid,
@@ -422,15 +405,76 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 				},
 				IngestibleRel{
 					RelProps: map[string]any{
-						"isacl":                false,
-						"sidfiltering":         trust.SidFilteringEnabled,
-						"tgtdelegationenabled": trust.TGTDelegationEnabled,
-						"trustattributes":      finalTrustAttributes,
-						"trusttype":            trust.TrustType,
-						"transitive":           trust.IsTransitive},
-					RelType: ad.TrustedBy,
+						"isacl":                  false,
+						"tgtdelegation":          trust.TGTDelegationEnabled,
+						"trustattributesinbound": finalTrustAttributes,
+						"trusttype":              trust.TrustType,
+						"trusttransitive":        trust.IsTransitive},
+					RelType: edgeType,
 				},
 			))
+
+			if edgeType == ad.CrossForestTrust && trust.TGTDelegationEnabled {
+				parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
+					IngestibleSource{
+						Source:     trust.TargetDomainSid,
+						SourceType: ad.Domain,
+					},
+					IngestibleTarget{
+						Target:     domain.ObjectIdentifier,
+						TargetType: ad.Domain,
+					},
+					IngestibleRel{
+						RelProps: map[string]any{
+							"isacl":     false,
+							"trusttype": trust.TrustType,
+						},
+						RelType: ad.AbuseTGTDelegation,
+					},
+				))
+			}
+		}
+
+		if dir == TrustDirectionOutbound || dir == TrustDirectionBidirectional {
+			parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
+				IngestibleSource{
+					Source:     domain.ObjectIdentifier,
+					SourceType: ad.Domain,
+				},
+				IngestibleTarget{
+					Target:     trust.TargetDomainSid,
+					TargetType: ad.Domain,
+				},
+				IngestibleRel{
+					RelProps: map[string]any{
+						"isacl":                   false,
+						"spoofsidhistoryblocked":  trust.SidFilteringEnabled,
+						"trustattributesoutbound": finalTrustAttributes,
+						"trusttype":               trust.TrustType,
+						"trusttransitive":         trust.IsTransitive},
+					RelType: edgeType,
+				},
+			))
+
+			if edgeType == ad.CrossForestTrust && !trust.SidFilteringEnabled {
+				parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
+					IngestibleSource{
+						Source:     trust.TargetDomainSid,
+						SourceType: ad.Domain,
+					},
+					IngestibleTarget{
+						Target:     domain.ObjectIdentifier,
+						TargetType: ad.Domain,
+					},
+					IngestibleRel{
+						RelProps: map[string]any{
+							"isacl":     false,
+							"trusttype": trust.TrustType,
+						},
+						RelType: ad.SpoofSIDHistory,
+					},
+				))
+			}
 		}
 	}
 

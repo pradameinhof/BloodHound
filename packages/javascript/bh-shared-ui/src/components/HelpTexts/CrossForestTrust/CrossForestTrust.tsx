@@ -14,11 +14,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Typography } from '@mui/material';
-import { FC } from 'react';
+import Abuse from './Abuse';
+import General from './General';
+import References from './References';
 
-const References: FC = () => {
-    return <Typography>No Information Available</Typography>;
+const CrossForestTrust = {
+    general: General,
+    abuse: Abuse,
+    references: References,
 };
 
-export default References;
+export default CrossForestTrust;

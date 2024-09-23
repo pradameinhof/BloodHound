@@ -16,14 +16,12 @@
 
 import Abuse from './Abuse';
 import General from './General';
-import Opsec from './Opsec';
 import References from './References';
 
-const TrustedBy = {
+const SameForestTrust = {
     general: General,
     abuse: Abuse,
-    opsec: Opsec,
     references: References,
 };
 
-export default TrustedBy;
+export default SameForestTrust;

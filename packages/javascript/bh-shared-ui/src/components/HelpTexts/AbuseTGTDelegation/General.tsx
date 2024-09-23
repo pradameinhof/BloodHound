@@ -22,10 +22,11 @@ const General: FC<EdgeInfoProps> = ({ sourceName, targetName }) => {
     return (
         <>
             <Typography variant='body2'>
-                The domain {sourceName} is trusted by the domain {targetName}.
+                The cross-forest trust from {targetName} to {sourceName} has TGT delegation enabled.
             </Typography>
             <Typography variant='body2'>
-                This edge is informational and does not indicate any attacks, only that a trust exists.
+                When a resource in {sourceName} is configured with unconstrained delegation, principals from{' '}
+                {targetName} will automatically forward their Ticket Granting Ticket (TGT) to that resource upon access.
             </Typography>
         </>
     );

@@ -14,11 +14,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-import { Typography } from '@mui/material';
-import { FC } from 'react';
+import Abuse from './Abuse';
+import General from './General';
+import Opsec from './Opsec';
+import References from './References';
 
-const Abuse: FC = () => {
-    return <Typography variant='body2'>There is no abuse associated with this edge.</Typography>;
+const AbuseTGTDelegation = {
+    general: General,
+    abuse: Abuse,
+    opsec: Opsec,
+    references: References,
 };
 
-export default Abuse;
+export default AbuseTGTDelegation;
