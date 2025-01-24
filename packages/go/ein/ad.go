@@ -364,12 +364,11 @@ func ParseGpLinks(links []GPLink, itemIdentifier string, itemType graph.Kind) []
 func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 	parsedData := ParsedDomainTrustData{}
 	for _, trust := range domain.Trusts {
-		var finalTrustAttributes int
+		finalTrustAttributes := -1
 		switch converted := trust.TrustAttributes.(type) {
 		case string:
 			if i, err := strconv.Atoi(converted); err != nil {
 				slog.Error(fmt.Sprintf("Error converting trust attributes %s to int", converted))
-				finalTrustAttributes = 0
 			} else {
 				finalTrustAttributes = i
 			}
@@ -377,7 +376,6 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 			finalTrustAttributes = converted
 		default:
 			slog.Error(fmt.Sprintf("Error converting trust attributes %s to int", converted))
-			finalTrustAttributes = 0
 		}
 
 		parsedData.ExtraNodeProps = append(parsedData.ExtraNodeProps, IngestibleNode{
@@ -394,6 +392,17 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 
 		var dir = trust.TrustDirection
 		if dir == TrustDirectionInbound || dir == TrustDirectionBidirectional {
+			realProps := map[string]any{
+				"isacl":           false,
+				"trusttype":       trust.TrustType,
+				"trusttransitive": trust.IsTransitive}
+
+			// Only add trustattributes if actually collected
+			if finalTrustAttributes >= 0 {
+				realProps["trustattributesinbound"] = finalTrustAttributes
+				realProps["tgtdelegation"] = trust.TGTDelegationEnabled // collection of tgtdelegation was added with trustattributes
+			}
+
 			parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
 				IngestibleSource{
 					Source:     trust.TargetDomainSid,
@@ -404,13 +413,8 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 					TargetType: ad.Domain,
 				},
 				IngestibleRel{
-					RelProps: map[string]any{
-						"isacl":                  false,
-						"tgtdelegation":          trust.TGTDelegationEnabled,
-						"trustattributesinbound": finalTrustAttributes,
-						"trusttype":              trust.TrustType,
-						"trusttransitive":        trust.IsTransitive},
-					RelType: edgeType,
+					RelProps: realProps,
+					RelType:  edgeType,
 				},
 			))
 
@@ -436,6 +440,17 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 		}
 
 		if dir == TrustDirectionOutbound || dir == TrustDirectionBidirectional {
+			realProps := map[string]any{
+				"isacl":                  false,
+				"spoofsidhistoryblocked": trust.SidFilteringEnabled,
+				"trusttype":              trust.TrustType,
+				"trusttransitive":        trust.IsTransitive}
+
+			// Only add trustattributes if actually collected
+			if finalTrustAttributes >= 0 {
+				realProps["trustattributesoutbound"] = finalTrustAttributes
+			}
+
 			parsedData.TrustRelationships = append(parsedData.TrustRelationships, NewIngestibleRelationship(
 				IngestibleSource{
 					Source:     domain.ObjectIdentifier,
@@ -446,13 +461,8 @@ func ParseDomainTrusts(domain Domain) ParsedDomainTrustData {
 					TargetType: ad.Domain,
 				},
 				IngestibleRel{
-					RelProps: map[string]any{
-						"isacl":                   false,
-						"spoofsidhistoryblocked":  trust.SidFilteringEnabled,
-						"trustattributesoutbound": finalTrustAttributes,
-						"trusttype":               trust.TrustType,
-						"trusttransitive":         trust.IsTransitive},
-					RelType: edgeType,
+					RelProps: realProps,
+					RelType:  edgeType,
 				},
 			))
 
