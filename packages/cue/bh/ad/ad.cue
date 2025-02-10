@@ -768,6 +768,13 @@ RestrictOutboundNTLM: types.#StringEnum & {
 	representation: "restrictoutboundntlm"
 }
 
+GroupScope: types.#StringEnum & {
+	symbol:         "GroupScope"
+	schema:         "ad"
+	name:           "Group Scope"
+	representation: "groupscope"
+}
+
 Properties: [
 	AdminCount,
 	CASecurityCollected,
@@ -873,7 +880,8 @@ Properties: [
 	LockoutDuration,
 	LockoutObservationWindow,
 	SMBSigning,
-	RestrictOutboundNTLM
+	RestrictOutboundNTLM,
+	GroupScope
 ]
 
 // Kinds
