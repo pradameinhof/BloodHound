@@ -86,6 +86,10 @@ const References: FC = () => {
                 SID filter as security boundary between domains? (Part 4) - Bypass SID filtering research
             </Link>
             <br />
+            <Link target='_blank' rel='noopener' href='https://github.com/FSecureLABS/SharpGPOAbuse'>
+                SharpGPOAbuse
+            </Link>
+            <br />
         </Box>
     );
 };

