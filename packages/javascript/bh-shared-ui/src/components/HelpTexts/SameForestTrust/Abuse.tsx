@@ -88,7 +88,7 @@ const Abuse: FC = () => {
             <Typography variant='body1'>GPO linked on Site</Typography>
             <Typography variant='body2'>
                 AD sites are stored in the forest-wide Configuration NC partition, writable by any DC within the forest.
-                An attacker with SYSTEM access to a DC can link a malicious GPO to the site of a any DC in the forest.
+                An attacker with SYSTEM access to a DC can link a malicious GPO to the site of any DC in the forest.
             </Typography>
 
             <Typography variant='body2'>
