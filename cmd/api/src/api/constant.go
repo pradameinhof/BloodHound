@@ -48,6 +48,7 @@ const (
 	// URI path parameters
 	URIPathVariableApplicationConfigurationParameter = "parameter"
 	URIPathVariableAssetGroupID                      = "asset_group_id"
+	URIPathVariableAssetGroupLabelID                 = "asset_group_label_id"
 	URIPathVariableAssetGroupSelectorID              = "asset_group_selector_id"
 	URIPathVariableAttackPathID                      = "attack_path_id"
 	URIPathVariableClientID                          = "client_id"
