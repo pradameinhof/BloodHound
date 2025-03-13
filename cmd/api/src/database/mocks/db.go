@@ -945,6 +945,21 @@ func (mr *MockDatabaseMockRecorder) GetAssetGroupLabel(arg0, arg1 interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupLabel", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupLabel), arg0, arg1)
 }
 
+// GetAssetGroupLabelSelectors mocks base method.
+func (m *MockDatabase) GetAssetGroupLabelSelectors(arg0 context.Context, arg1 int) ([]model.AssetGroupLabelSelector, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssetGroupLabelSelectors", arg0, arg1)
+	ret0, _ := ret[0].([]model.AssetGroupLabelSelector)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetGroupLabelSelectors indicates an expected call of GetAssetGroupLabelSelectors.
+func (mr *MockDatabaseMockRecorder) GetAssetGroupLabelSelectors(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupLabelSelectors", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupLabelSelectors), arg0, arg1)
+}
+
 // GetAssetGroupSelector mocks base method.
 func (m *MockDatabase) GetAssetGroupSelector(arg0 context.Context, arg1 int32) (model.AssetGroupSelector, error) {
 	m.ctrl.T.Helper()

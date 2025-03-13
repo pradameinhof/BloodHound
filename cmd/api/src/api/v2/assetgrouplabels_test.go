@@ -212,3 +212,84 @@ func TestResources_CreateAssetGroupLabelSelector(t *testing.T) {
 			},
 		})
 }
+
+func TestResources_GetAssetGroupLabelsSelectors(t *testing.T) {
+	var (
+		mockCtrl      = gomock.NewController(t)
+		mockDB        = mocks_db.NewMockDatabase(mockCtrl)
+		resourcesInst = v2.Resources{
+			DB: mockDB,
+		}
+	)
+	defer mockCtrl.Finish()
+
+	apitest.
+		NewHarness(t, resourcesInst.GetAssetGroupLabelsSelectors).
+		Run([]apitest.Case{
+			{
+				Name: "Bad Request - No Asset Group Label ID",
+				Test: func(output apitest.Output) {
+					apitest.StatusCode(output, http.StatusBadRequest)
+					apitest.BodyContains(output, "no asset group label id specified in url")
+				},
+			},
+			{
+				Name: "Bad Request - Invalid Asset Group Label ID",
+				Input: func(input *apitest.Input) {
+					apitest.SetURLVar(input, api.URIPathVariableAssetGroupLabelID, "foo")
+				},
+				Test: func(output apitest.Output) {
+					apitest.StatusCode(output, http.StatusBadRequest)
+					apitest.BodyContains(output, "invalid asset group label id specified in url")
+				},
+			},
+			{
+				Name: "DB error - GetAssetGroupLabel",
+				Input: func(input *apitest.Input) {
+					apitest.SetURLVar(input, api.URIPathVariableAssetGroupLabelID, "1")
+				},
+				Setup: func() {
+					mockDB.EXPECT().
+						GetAssetGroupLabel(gomock.Any(), gomock.Any()).
+						Return(model.AssetGroupLabel{}, errors.New("entity not found")).Times(1)
+				},
+				Test: func(output apitest.Output) {
+					apitest.StatusCode(output, http.StatusBadRequest)
+					apitest.BodyContains(output, "invalid asset group label id specified in url")
+				},
+			},
+			{
+				Name: "DB error - GetAssetGroupLabelSelectors",
+				Input: func(input *apitest.Input) {
+					apitest.SetURLVar(input, api.URIPathVariableAssetGroupLabelID, "1")
+				},
+				Setup: func() {
+					mockDB.EXPECT().
+						GetAssetGroupLabelSelectors(gomock.Any(), gomock.Any()).
+						Return([]model.AssetGroupLabelSelector{}, errors.New("db error")).Times(1)
+					mockDB.EXPECT().GetAssetGroupLabel(gomock.Any(), gomock.Any()).
+						Return(model.AssetGroupLabel{}, nil).Times(1)
+				},
+				Test: func(output apitest.Output) {
+					apitest.StatusCode(output, http.StatusInternalServerError)
+					apitest.BodyContains(output, api.ErrorResponseDetailsInternalServerError)
+				},
+			},
+			{
+				Name: "Success",
+				Input: func(input *apitest.Input) {
+					apitest.SetURLVar(input, api.URIPathVariableAssetGroupLabelID, "1")
+				},
+				Setup: func() {
+					mockDB.EXPECT().
+						GetAssetGroupLabelSelectors(gomock.Any(), gomock.Any()).
+						Return([]model.AssetGroupLabelSelector{}, nil).Times(1)
+					mockDB.EXPECT().GetAssetGroupLabel(gomock.Any(), gomock.Any()).
+						Return(model.AssetGroupLabel{}, nil).Times(1)
+				},
+				Test: func(output apitest.Output) {
+					apitest.StatusCode(output, http.StatusOK)
+				},
+			},
+		})
+}

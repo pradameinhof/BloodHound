@@ -41,6 +41,7 @@ type AssetGroupLabelData interface {
 // AssetGroupLabelSelectorData defines the methods required to interact with the asset_group_label_selectors and asset_group_label_selector_seeds tables
 type AssetGroupLabelSelectorData interface {
 	CreateAssetGroupLabelSelector(ctx context.Context, assetGroupLabelId int, userId string, name string, description string, isDefault bool, allowDisable bool, autoCertify bool, seeds []model.SelectorSeed) (model.AssetGroupLabelSelector, error)
+	GetAssetGroupLabelSelectors(ctx context.Context, assetGroupLabelID int) ([]model.AssetGroupLabelSelector, error)
 }
 
 func (s *BloodhoundDB) CreateAssetGroupLabelSelector(ctx context.Context, assetGroupLabelId int, userId string, name string, description string, isDefault bool, allowDisable bool, autoCertify bool, seeds []model.SelectorSeed) (model.AssetGroupLabelSelector, error) {
@@ -96,4 +97,19 @@ func (s *BloodhoundDB) CreateAssetGroupLabel(ctx context.Context, assetGroupTier
 		return model.AssetGroupLabel{}, err
 	}
 	return label, nil
+}
+
+func (s *BloodhoundDB) GetAssetGroupLabelSelectors(ctx context.Context, assetGroupLabelID int) ([]model.AssetGroupLabelSelector, error) {
+	var selectors []model.AssetGroupLabelSelector
+	if result := s.db.WithContext(ctx).Raw(fmt.Sprintf("SELECT id, asset_group_label_id, created_at, created_by, updated_at, updated_by, name, description, is_default, allow_disable, auto_certify FROM %s WHERE asset_group_label_id = ?", assetGroupSelectorTable), assetGroupLabelID).Find(&selectors); result.Error != nil {
+		return []model.AssetGroupLabelSelector{}, CheckError(result)
+		// return []model.AssetGroupLabelSelector{}, database.CheckError(result)
+	} else {
+		for index, selector := range selectors {
+			if result := s.db.WithContext(ctx).Raw(fmt.Sprintf("SELECT selector_id, type, value FROM %s WHERE selector_id = ?", assetGroupSelectorSeedTable), selector.ID).Scan(&selectors[index].Seeds); result.Error != nil {
+				return []model.AssetGroupLabelSelector{}, CheckError(result)
+			}
+		}
+	}
+	return selectors, nil
 }

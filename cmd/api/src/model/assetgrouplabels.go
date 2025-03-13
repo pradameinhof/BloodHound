@@ -64,3 +64,7 @@ type AssetGroupLabelSelector struct {
 
 	Seeds []SelectorSeed `json:"seeds" validate:"required" gorm:"-"`
 }
+
+type ListSelectorsResponse struct {
+	Selectors []AssetGroupLabelSelector `json:"selectors"`
+}
