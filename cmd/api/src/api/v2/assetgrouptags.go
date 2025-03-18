@@ -34,10 +34,10 @@ import (
 )
 
 // Checks that any cypher selectors are valid cypher and not too complex.
-func areCypherSelectorsValidCypher(graph queries.Graph, seeds []model.SelectorSeed) (bool, error) {
+func areCypherSelectorSeedsValid(graph queries.Graph, seeds []model.SelectorSeed) (bool, error) {
 	for _, seed := range seeds {
 		if seed.Type == model.SelectorTypeCypher {
-			if _, err := graph.PrepareCypherQuery(seed.Value, queries.MaxSelectorQueryComplexityWeight); err != nil {
+			if _, err := graph.PrepareCypherQuery(seed.Value, queries.QueryComplexityLimitSelector); err != nil {
 				return false, err
 			}
 		}
@@ -45,45 +45,45 @@ func areCypherSelectorsValidCypher(graph queries.Graph, seeds []model.SelectorSe
 	return true, nil
 }
 
-func (s *Resources) CreateAssetGroupLabelSelector(response http.ResponseWriter, request *http.Request) {
+func (s *Resources) CreateAssetGroupTagSelector(response http.ResponseWriter, request *http.Request) {
 	var (
-		err error
-		sel model.AssetGroupLabelSelector
+		err        error
+		sel        model.AssetGroupTagSelector
+		actorIdStr = mux.Vars(request)[api.URIPathVariableAssetGroupTagID]
 	)
-	defer measure.ContextMeasure(request.Context(), slog.LevelDebug, "Asset Group Label Selector Create")()
+	defer measure.ContextMeasure(request.Context(), slog.LevelDebug, "Asset Group Tag Selector Create")()
 
 	if err = json.NewDecoder(request.Body).Decode(&sel); err != nil {
 		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, api.ErrorResponsePayloadUnmarshalError, request), response)
 	} else if errs := validation.Validate(sel); len(errs) > 0 {
 		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, errs.Error(), request), response)
-	} else if idStr, hasLabelID := mux.Vars(request)[api.URIPathVariableAssetGroupLabelID]; !hasLabelID {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrNoAssetGroupLabelId, request), response)
-	} else if id, err := strconv.Atoi(idStr); err != nil {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrInvalidAssetGroupLabelId, request), response)
-	} else if _, err := s.DB.GetAssetGroupLabel(request.Context(), id); err != nil {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrInvalidAssetGroupLabelId, request), response)
+	} else if id, err := strconv.Atoi(actorIdStr); err != nil {
+		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrInvalidAssetGroupTagId, request), response)
+	} else if _, err := s.DB.GetAssetGroupTag(request.Context(), id); err != nil {
+		api.HandleDatabaseError(request, response, err)
 	} else if actor, isUser := auth.GetUserFromAuthCtx(ctx.FromRequest(request).AuthCtx); !isUser {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusUnauthorized, "unknown user", request), response)
-	} else if validCypher, err := areCypherSelectorsValidCypher(s.GraphQuery, sel.Seeds); !validCypher {
+		slog.Error("Unable to get user from auth context")
+		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusInternalServerError, "unknown user", request), response)
+	} else if validCypher, err := areCypherSelectorSeedsValid(s.GraphQuery, sel.Seeds); !validCypher {
 		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, fmt.Sprintf("cypher is invalid: %v", err), request), response)
-	} else if selector, err := s.DB.CreateAssetGroupLabelSelector(request.Context(), id, actor.ID.String(), sel.Name, sel.Description, false, true, sel.AutoCertify, sel.Seeds); err != nil {
+	} else if selector, err := s.DB.CreateAssetGroupTagSelector(request.Context(), id, actor.ID.String(), sel.Name, sel.Description, false, true, sel.AutoCertify, sel.Seeds); err != nil {
 		api.HandleDatabaseError(request, response, err)
 	} else {
 		api.WriteBasicResponse(request.Context(), selector, http.StatusCreated, response)
 	}
 }
 
-func (s *Resources) GetAssetGroupLabelsSelectors(response http.ResponseWriter, request *http.Request) {
+func (s *Resources) GetAssetGroupTagSelectors(response http.ResponseWriter, request *http.Request) {
 
 	defer measure.ContextMeasure(request.Context(), slog.LevelDebug, "Asset Group Label Get Selector")()
 
-	if rawAssetGroupLabelID, hasAssetGroupLabelID := mux.Vars(request)[api.URIPathVariableAssetGroupLabelID]; !hasAssetGroupLabelID {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrNoAssetGroupLabelId, request), response)
+	if rawAssetGroupLabelID, hasAssetGroupLabelID := mux.Vars(request)[api.URIPathVariableAssetGroupTagID]; !hasAssetGroupLabelID {
+		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, api.ErrNoAssetGroupTagId, request), response)
 	} else if assetGroupLabelID, err := strconv.Atoi(rawAssetGroupLabelID); err != nil {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrInvalidAssetGroupLabelId, request), response)
-	} else if _, err := s.DB.GetAssetGroupLabel(request.Context(), assetGroupLabelID); err != nil {
-		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrInvalidAssetGroupLabelId, request), response)
-	} else if selectors, err := s.DB.GetAssetGroupLabelSelectors(request.Context(), assetGroupLabelID); err != nil {
+		api.WriteErrorResponse(request.Context(), api.BuildErrorResponse(http.StatusBadRequest, ErrInvalidAssetGroupTagId, request), response)
+	} else if _, err := s.DB.GetAssetGroupTag(request.Context(), assetGroupLabelID); err != nil {
+		api.HandleDatabaseError(request, response, err)
+	} else if selectors, err := s.DB.GetAssetGroupTagSelectorsByTagId(request.Context(), assetGroupLabelID); err != nil {
 		api.HandleDatabaseError(request, response, err)
 	} else {
 		api.WriteBasicResponse(request.Context(), model.ListSelectorsResponse{Selectors: selectors}, http.StatusOK, response)

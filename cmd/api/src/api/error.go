@@ -72,6 +72,7 @@ const (
 	ErrorResponseUserDuplicateEmail                 = "email must be unique"
 	ErrorResponseDetailsUniqueViolation             = "unique constraint was violated"
 	ErrorResponseDetailsNotImplemented              = "All good things to those who wait. Not implemented."
+	ErrNoAssetGroupTagId                            = "no asset group tag id specified in url"
 
 	FmtErrorResponseDetailsBadQueryParameters            = "there are errors in the query parameters: %v"
 	FmtErrorResponseDetailsMissingRequiredQueryParameter = "missing required query parameter: %v"

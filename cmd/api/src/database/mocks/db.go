@@ -169,34 +169,48 @@ func (mr *MockDatabaseMockRecorder) CreateAssetGroupCollection(arg0, arg1, arg2 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetGroupCollection", reflect.TypeOf((*MockDatabase)(nil).CreateAssetGroupCollection), arg0, arg1, arg2)
 }
 
-// CreateAssetGroupLabel mocks base method.
-func (m *MockDatabase) CreateAssetGroupLabel(arg0 context.Context, arg1 int, arg2, arg3, arg4 string) (model.AssetGroupLabel, error) {
+// CreateAssetGroupHistoryRecord mocks base method.
+func (m *MockDatabase) CreateAssetGroupHistoryRecord(arg0 context.Context, arg1, arg2 string, arg3 model.AssetGroupHistoryAction, arg4 int, arg5, arg6 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAssetGroupLabel", arg0, arg1, arg2, arg3, arg4)
-	ret0, _ := ret[0].(model.AssetGroupLabel)
+	ret := m.ctrl.Call(m, "CreateAssetGroupHistoryRecord", arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateAssetGroupHistoryRecord indicates an expected call of CreateAssetGroupHistoryRecord.
+func (mr *MockDatabaseMockRecorder) CreateAssetGroupHistoryRecord(arg0, arg1, arg2, arg3, arg4, arg5, arg6 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetGroupHistoryRecord", reflect.TypeOf((*MockDatabase)(nil).CreateAssetGroupHistoryRecord), arg0, arg1, arg2, arg3, arg4, arg5, arg6)
+}
+
+// CreateAssetGroupTag mocks base method.
+func (m *MockDatabase) CreateAssetGroupTag(arg0 context.Context, arg1 model.AssetGroupTagType, arg2, arg3, arg4 string) (model.AssetGroupTag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateAssetGroupTag", arg0, arg1, arg2, arg3, arg4)
+	ret0, _ := ret[0].(model.AssetGroupTag)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateAssetGroupLabel indicates an expected call of CreateAssetGroupLabel.
-func (mr *MockDatabaseMockRecorder) CreateAssetGroupLabel(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
+// CreateAssetGroupTag indicates an expected call of CreateAssetGroupTag.
+func (mr *MockDatabaseMockRecorder) CreateAssetGroupTag(arg0, arg1, arg2, arg3, arg4 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetGroupLabel", reflect.TypeOf((*MockDatabase)(nil).CreateAssetGroupLabel), arg0, arg1, arg2, arg3, arg4)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetGroupTag", reflect.TypeOf((*MockDatabase)(nil).CreateAssetGroupTag), arg0, arg1, arg2, arg3, arg4)
 }
 
-// CreateAssetGroupLabelSelector mocks base method.
-func (m *MockDatabase) CreateAssetGroupLabelSelector(arg0 context.Context, arg1 int, arg2, arg3, arg4 string, arg5, arg6, arg7 bool, arg8 []model.SelectorSeed) (model.AssetGroupLabelSelector, error) {
+// CreateAssetGroupTagSelector mocks base method.
+func (m *MockDatabase) CreateAssetGroupTagSelector(arg0 context.Context, arg1 int, arg2, arg3, arg4 string, arg5, arg6, arg7 bool, arg8 []model.SelectorSeed) (model.AssetGroupTagSelector, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateAssetGroupLabelSelector", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
-	ret0, _ := ret[0].(model.AssetGroupLabelSelector)
+	ret := m.ctrl.Call(m, "CreateAssetGroupTagSelector", arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+	ret0, _ := ret[0].(model.AssetGroupTagSelector)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// CreateAssetGroupLabelSelector indicates an expected call of CreateAssetGroupLabelSelector.
-func (mr *MockDatabaseMockRecorder) CreateAssetGroupLabelSelector(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 interface{}) *gomock.Call {
+// CreateAssetGroupTagSelector indicates an expected call of CreateAssetGroupTagSelector.
+func (mr *MockDatabaseMockRecorder) CreateAssetGroupTagSelector(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetGroupLabelSelector", reflect.TypeOf((*MockDatabase)(nil).CreateAssetGroupLabelSelector), arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateAssetGroupTagSelector", reflect.TypeOf((*MockDatabase)(nil).CreateAssetGroupTagSelector), arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 }
 
 // CreateAuditLog mocks base method.
@@ -930,34 +944,19 @@ func (mr *MockDatabaseMockRecorder) GetAssetGroupCollections(arg0, arg1, arg2, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupCollections", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupCollections), arg0, arg1, arg2, arg3)
 }
 
-// GetAssetGroupLabel mocks base method.
-func (m *MockDatabase) GetAssetGroupLabel(arg0 context.Context, arg1 int) (model.AssetGroupLabel, error) {
+// GetAssetGroupHistoryRecords mocks base method.
+func (m *MockDatabase) GetAssetGroupHistoryRecords(arg0 context.Context) ([]model.AssetGroupHistory, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAssetGroupLabel", arg0, arg1)
-	ret0, _ := ret[0].(model.AssetGroupLabel)
+	ret := m.ctrl.Call(m, "GetAssetGroupHistoryRecords", arg0)
+	ret0, _ := ret[0].([]model.AssetGroupHistory)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetAssetGroupLabel indicates an expected call of GetAssetGroupLabel.
-func (mr *MockDatabaseMockRecorder) GetAssetGroupLabel(arg0, arg1 interface{}) *gomock.Call {
+// GetAssetGroupHistoryRecords indicates an expected call of GetAssetGroupHistoryRecords.
+func (mr *MockDatabaseMockRecorder) GetAssetGroupHistoryRecords(arg0 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupLabel", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupLabel), arg0, arg1)
-}
-
-// GetAssetGroupLabelSelectors mocks base method.
-func (m *MockDatabase) GetAssetGroupLabelSelectors(arg0 context.Context, arg1 int) ([]model.AssetGroupLabelSelector, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAssetGroupLabelSelectors", arg0, arg1)
-	ret0, _ := ret[0].([]model.AssetGroupLabelSelector)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// GetAssetGroupLabelSelectors indicates an expected call of GetAssetGroupLabelSelectors.
-func (mr *MockDatabaseMockRecorder) GetAssetGroupLabelSelectors(arg0, arg1 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupLabelSelectors", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupLabelSelectors), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupHistoryRecords", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupHistoryRecords), arg0)
 }
 
 // GetAssetGroupSelector mocks base method.
@@ -973,6 +972,36 @@ func (m *MockDatabase) GetAssetGroupSelector(arg0 context.Context, arg1 int32) (
 func (mr *MockDatabaseMockRecorder) GetAssetGroupSelector(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupSelector", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupSelector), arg0, arg1)
+}
+
+// GetAssetGroupTag mocks base method.
+func (m *MockDatabase) GetAssetGroupTag(arg0 context.Context, arg1 int) (model.AssetGroupTag, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssetGroupTag", arg0, arg1)
+	ret0, _ := ret[0].(model.AssetGroupTag)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetGroupTag indicates an expected call of GetAssetGroupTag.
+func (mr *MockDatabaseMockRecorder) GetAssetGroupTag(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupTag", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupTag), arg0, arg1)
+}
+
+// GetAssetGroupTagSelectorsByTagId mocks base method.
+func (m *MockDatabase) GetAssetGroupTagSelectorsByTagId(arg0 context.Context, arg1 int) ([]model.AssetGroupTagSelector, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAssetGroupTagSelectorsByTagId", arg0, arg1)
+	ret0, _ := ret[0].([]model.AssetGroupTagSelector)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAssetGroupTagSelectorsByTagId indicates an expected call of GetAssetGroupTagSelectorsByTagId.
+func (mr *MockDatabaseMockRecorder) GetAssetGroupTagSelectorsByTagId(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAssetGroupTagSelectorsByTagId", reflect.TypeOf((*MockDatabase)(nil).GetAssetGroupTagSelectorsByTagId), arg0, arg1)
 }
 
 // GetAuthSecret mocks base method.
