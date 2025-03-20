@@ -24,6 +24,7 @@ import (
 	"github.com/specterops/bloodhound/src/api"
 	v2 "github.com/specterops/bloodhound/src/api/v2"
 	"github.com/specterops/bloodhound/src/api/v2/apitest"
+	"github.com/specterops/bloodhound/src/database"
 	mocks_db "github.com/specterops/bloodhound/src/database/mocks"
 	"github.com/specterops/bloodhound/src/model"
 	"github.com/specterops/bloodhound/src/queries"
@@ -259,11 +260,11 @@ func TestResources_GetAssetGroupTagSelectors(t *testing.T) {
 				Setup: func() {
 					mockDB.EXPECT().
 						GetAssetGroupTag(gomock.Any(), gomock.Any()).
-						Return(model.AssetGroupTag{}, errors.New("entity not found")).Times(1)
+						Return(model.AssetGroupTag{}, database.ErrNotFound).Times(1)
 				},
 				Test: func(output apitest.Output) {
-					apitest.StatusCode(output, http.StatusInternalServerError)
-					apitest.BodyContains(output, api.ErrorResponseDetailsInternalServerError)
+					apitest.StatusCode(output, http.StatusNotFound)
+					apitest.BodyContains(output, api.ErrorResponseDetailsResourceNotFound)
 				},
 			},
 			{
@@ -274,13 +275,13 @@ func TestResources_GetAssetGroupTagSelectors(t *testing.T) {
 				Setup: func() {
 					mockDB.EXPECT().
 						GetAssetGroupTagSelectorsByTagId(gomock.Any(), gomock.Any()).
-						Return([]model.AssetGroupTagSelector{}, errors.New("db error")).Times(1)
+						Return([]model.AssetGroupTagSelector{}, database.ErrNotFound).Times(1)
 					mockDB.EXPECT().GetAssetGroupTag(gomock.Any(), gomock.Any()).
 						Return(model.AssetGroupTag{}, nil).Times(1)
 				},
 				Test: func(output apitest.Output) {
-					apitest.StatusCode(output, http.StatusInternalServerError)
-					apitest.BodyContains(output, api.ErrorResponseDetailsInternalServerError)
+					apitest.StatusCode(output, http.StatusNotFound)
+					apitest.BodyContains(output, api.ErrorResponseDetailsResourceNotFound)
 				},
 			},
 			{

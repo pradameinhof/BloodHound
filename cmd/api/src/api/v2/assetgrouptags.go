@@ -73,6 +73,7 @@ func (s *Resources) CreateAssetGroupTagSelector(response http.ResponseWriter, re
 	}
 }
 
+// Retrieves all selectors associated with a given asset group tag ID
 func (s *Resources) GetAssetGroupTagSelectors(response http.ResponseWriter, request *http.Request) {
 
 	defer measure.ContextMeasure(request.Context(), slog.LevelDebug, "Asset Group Label Get Selector")()
