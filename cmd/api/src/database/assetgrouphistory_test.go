@@ -22,6 +22,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/specterops/bloodhound/src/database/types/null"
 	"github.com/specterops/bloodhound/src/model"
 	"github.com/specterops/bloodhound/src/test/integration"
 	"github.com/stretchr/testify/require"
@@ -29,16 +30,23 @@ import (
 
 func TestDatabase_CreateAndGetAssetGroupHistory(t *testing.T) {
 	var (
-		dbInst  = integration.SetupDB(t)
-		testCtx = context.Background()
+		dbInst            = integration.SetupDB(t)
+		testCtx           = context.Background()
+		testTarget        = "test target"
+		testAssetGroupTag = 1
 	)
 
-	err := dbInst.CreateAssetGroupHistoryRecord(testCtx, model.AssetGroupHistoryActorSystem, "", model.AssetGroupHistoryActionDeleteSelector, 1, "", "")
+	err := dbInst.CreateAssetGroupHistoryRecord(testCtx, model.AssetGroupActorSystem, testTarget, model.AssetGroupHistoryActionDeleteSelector, testAssetGroupTag, null.String{}, null.String{})
 	require.NoError(t, err)
 
 	record, err := dbInst.GetAssetGroupHistoryRecords(testCtx)
 	require.NoError(t, err)
 	require.Len(t, record, 1)
 	require.Equal(t, model.AssetGroupHistoryActionDeleteSelector, record[0].Action)
-	require.Equal(t, model.AssetGroupHistoryActorSystem, record[0].Actor)
+	require.Equal(t, model.AssetGroupActorSystem, record[0].Actor)
+	require.Equal(t, testTarget, record[0].Target)
+	require.Equal(t, testAssetGroupTag, record[0].AssetGroupTagId)
+	require.Equal(t, null.String{}, record[0].EnvironmentId)
+	require.Equal(t, null.String{}, record[0].Note)
+	require.False(t, record[0].CreatedAt.IsZero())
 }

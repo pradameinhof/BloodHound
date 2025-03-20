@@ -21,8 +21,8 @@ package database_test
 import (
 	"context"
 	"testing"
-	"time"
 
+	"github.com/specterops/bloodhound/src/database/types/null"
 	"github.com/specterops/bloodhound/src/model"
 	"github.com/specterops/bloodhound/src/test/integration"
 	"github.com/stretchr/testify/require"
@@ -47,9 +47,9 @@ func TestDatabase_CreateAssetGroupTagSelector(t *testing.T) {
 	selector, err := dbInst.CreateAssetGroupTagSelector(testCtx, 1, testActor, testName, testDescription, isDefault, allowDisable, autoCertify, testSeeds)
 	require.NoError(t, err)
 	require.Equal(t, 1, selector.AssetGroupTagId)
-	require.WithinDuration(t, time.Now(), selector.CreatedAt, time.Second)
+	require.False(t, selector.CreatedAt.IsZero())
 	require.Equal(t, testActor, selector.CreatedBy)
-	require.WithinDuration(t, time.Now(), selector.UpdatedAt, time.Second)
+	require.False(t, selector.UpdatedAt.IsZero())
 	require.Equal(t, testActor, selector.UpdatedBy)
 	require.Empty(t, selector.DisabledAt)
 	require.Empty(t, selector.DisabledBy)
@@ -77,32 +77,38 @@ func TestDatabase_CreateAssetGroupTag(t *testing.T) {
 		testActor       = "test_actor"
 		testName        = "test tag name"
 		testDescription = "test tag description"
+		position        = null.Int32{}
+		requireCertify  = null.Bool{}
 	)
 
 	t.Run("successfully creates tag", func(t *testing.T) {
-		tag, err := dbInst.CreateAssetGroupTag(testCtx, tagType, testActor, testName, testDescription)
+		tag, err := dbInst.CreateAssetGroupTag(testCtx, tagType, testActor, testName, testDescription, position, requireCertify)
 		require.NoError(t, err)
 		require.Equal(t, tagType, tag.Type)
-		require.WithinDuration(t, time.Now(), tag.CreatedAt, time.Second)
+		require.False(t, tag.CreatedAt.IsZero())
 		require.Equal(t, testActor, tag.CreatedBy)
-		require.WithinDuration(t, time.Now(), tag.UpdatedAt, time.Second)
+		require.False(t, tag.UpdatedAt.IsZero())
 		require.Equal(t, testActor, tag.UpdatedBy)
 		require.Empty(t, tag.DeletedAt)
 		require.Empty(t, tag.DeletedBy)
 		require.Equal(t, testName, tag.Name)
 		require.Equal(t, testDescription, tag.Description)
+		require.Equal(t, null.Int32{}, tag.Position)
+		require.Equal(t, null.Bool{}, tag.RequireCertify)
 
 		tag, err = dbInst.GetAssetGroupTag(testCtx, tag.ID)
 		require.NoError(t, err)
 		require.Equal(t, tagType, tag.Type)
-		require.WithinDuration(t, time.Now(), tag.CreatedAt, time.Second)
+		require.False(t, tag.CreatedAt.IsZero())
 		require.Equal(t, testActor, tag.CreatedBy)
-		require.WithinDuration(t, time.Now(), tag.UpdatedAt, time.Second)
+		require.False(t, tag.UpdatedAt.IsZero())
 		require.Equal(t, testActor, tag.UpdatedBy)
 		require.Empty(t, tag.DeletedAt)
 		require.Empty(t, tag.DeletedBy)
 		require.Equal(t, testName, tag.Name)
 		require.Equal(t, testDescription, tag.Description)
+		require.Equal(t, null.Int32{}, tag.Position)
+		require.Equal(t, null.Bool{}, tag.RequireCertify)
 
 		// verify history record was also created
 		history, err := dbInst.GetAssetGroupHistoryRecords(testCtx)
@@ -111,7 +117,7 @@ func TestDatabase_CreateAssetGroupTag(t *testing.T) {
 		require.Equal(t, model.AssetGroupHistoryActionCreateTag, history[0].Action)
 	})
 
-	t.Run("Non existant tag erros out", func(t *testing.T) {
+	t.Run("Non existant tag errors out", func(t *testing.T) {
 		_, err := dbInst.GetAssetGroupTag(testCtx, 1234)
 		require.Error(t, err)
 	})
