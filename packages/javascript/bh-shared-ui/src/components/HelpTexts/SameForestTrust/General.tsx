@@ -93,8 +93,8 @@ const General: FC<EdgeInfoProps> = ({ sourceName, targetName }) => {
             <Typography variant='body2'>
                 <b>Trust Type</b>
                 <br />
-                The trust type for same-forest trusts can be TreeRoot, ParentChild, or Shortcut. Refer to the "Microsoft
-                AD Trust Technical Documentation" under References for more details.
+                The trust type for same-forest trusts can be TreeRoot, ParentChild, or CrossLink (Shortcut). Refer to
+                the "Microsoft AD Trust Technical Documentation" under References for more details.
             </Typography>
         </>
     );

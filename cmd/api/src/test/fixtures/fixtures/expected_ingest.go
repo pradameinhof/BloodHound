@@ -93,7 +93,7 @@ var (
 			query.Kind(query.Relationship(), ad.SameForestTrust),
 			query.Kind(query.End(), ad.Domain),
 			query.Equals(query.EndProperty(common.ObjectID.String()), "S-1-5-21-3130019616-2776909439-2417379446")),
-		query.And( // Shortcut outbound
+		query.And( // CrossLink outbound
 			query.Kind(query.Start(), ad.Domain),
 			query.Equals(query.StartProperty(common.ObjectID.String()), "S-1-5-21-3130019616-2776909439-2417379446"),
 			query.Kind(query.Relationship(), ad.SameForestTrust),
@@ -117,19 +117,19 @@ var (
 			query.Kind(query.Relationship(), ad.CrossForestTrust),
 			query.Kind(query.End(), ad.Domain),
 			query.Equals(query.EndProperty(common.ObjectID.String()), "S-1-5-21-3130019616-2776909439-2417379446")),
-		query.And( // Realm outbound
+		query.And( // Kerberos outbound
 			query.Kind(query.Start(), ad.Domain),
 			query.Equals(query.StartProperty(common.ObjectID.String()), "S-1-5-21-3130019616-2776909439-2417379446"),
 			query.Kind(query.Relationship(), ad.CrossForestTrust),
 			query.Kind(query.End(), ad.Domain),
 			query.Equals(query.EndProperty(common.ObjectID.String()), "S-1-5-21-3084884204-958224920-2707782880")),
-		query.And( // Realm inbound
+		query.And( // Kerberos inbound
 			query.Kind(query.Start(), ad.Domain),
 			query.Equals(query.StartProperty(common.ObjectID.String()), "S-1-5-21-3084884204-958224920-2707782880"),
 			query.Kind(query.Relationship(), ad.CrossForestTrust),
 			query.Kind(query.End(), ad.Domain),
 			query.Equals(query.EndProperty(common.ObjectID.String()), "S-1-5-21-3130019616-2776909439-2417379446")),
-		query.And( // SpoofSIDHistory inbound (based on realm outbound)
+		query.And( // SpoofSIDHistory inbound (based on Kerberos outbound)
 			query.Kind(query.Start(), ad.Domain),
 			query.Equals(query.StartProperty(common.ObjectID.String()), "S-1-5-21-3084884204-958224920-2707782880"),
 			query.Kind(query.Relationship(), ad.SpoofSIDHistory),
@@ -343,7 +343,7 @@ var (
 			query.Kind(query.Relationship(), ad.AbuseTGTDelegation),
 			query.Kind(query.End(), ad.Domain),
 			query.Equals(query.EndProperty(common.ObjectID.String()), "S-1-5-21-3130019616-2776909439-2417379446")),
-		query.And( // AbuseTGTDelegation inbound (based on realm inbound)
+		query.And( // AbuseTGTDelegation inbound (based on Kerberos inbound)
 			query.Kind(query.Start(), ad.Domain),
 			query.Equals(query.StartProperty(common.ObjectID.String()), "S-1-5-21-3084884204-958224920-2707782880"),
 			query.Kind(query.Relationship(), ad.AbuseTGTDelegation),

@@ -108,8 +108,8 @@ const General: FC<EdgeInfoProps> = ({ sourceName, targetName }) => {
             <Typography variant='body2'>
                 <b>Trust Type</b>
                 <br />
-                The trust type for cross-forest trusts can be Forest, External, Realm, or Unknown. Refer to the
-                "Microsoft AD Trust Technical Documentation" under References for more details.
+                The trust type for cross-forest trusts can be Forest, External, Kerberos (Realm), or Unknown. Refer to
+                the "Microsoft AD Trust Technical Documentation" under References for more details.
             </Typography>
         </>
     );

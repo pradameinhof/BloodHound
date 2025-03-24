@@ -60,11 +60,11 @@
                 },
                 {
                     "TargetDomainSid": "S-1-5-21-3084884204-958224920-2707782877",
-                    "TargetDomainName": "SHORTCUT",
+                    "TargetDomainName": "CrossLink",
                     "IsTransitive": true,
                     "SidFilteringEnabled": false,
                     "TrustDirection": "Outbound",
-                    "TrustType": "Shortcut"
+                    "TrustType": "CrossLink"
                 },
                 {
                     "TargetDomainSid": "S-1-5-21-3084884204-958224920-2707782878",
@@ -84,11 +84,11 @@
                 },
                 {
                     "TargetDomainSid": "S-1-5-21-3084884204-958224920-2707782880",
-                    "TargetDomainName": "Realm",
+                    "TargetDomainName": "Kerberos",
                     "IsTransitive": true,
                     "SidFilteringEnabled": false,
                     "TrustDirection": "Bidirectional",
-                    "TrustType": "Realm"
+                    "TrustType": "Kerberos"
                 },
                 {
                     "TargetDomainSid": "S-1-5-21-3084884204-958224920-2707782881",
