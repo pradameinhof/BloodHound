@@ -26,12 +26,15 @@ type EntitySectionEndpointParams = {
     type?: 'graph';
 };
 
+export type EntityRelationshipQueryTypes = keyof typeof entityRelationshipEndpoints;
+
 export interface EntityInfoDataTableProps {
     id: string;
     label: string;
     countLabel?: string;
     sections?: EntityInfoDataTableProps[];
-    queryType?: keyof typeof entityRelationshipEndpoints;
+    parentLabels?: string[];
+    queryType?: EntityRelationshipQueryTypes;
 }
 
 let controller = new AbortController();

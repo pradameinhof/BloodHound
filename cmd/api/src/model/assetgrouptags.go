@@ -25,6 +25,10 @@ import (
 	"github.com/specterops/bloodhound/src/database/types/null"
 )
 
+const (
+	AssetGroupActorSystem = "SYSTEM"
+)
+
 type SelectorType int
 
 const (
@@ -40,19 +44,19 @@ const (
 )
 
 type AssetGroupTag struct {
-	ID           int               `json:"id"`
-	Type         AssetGroupTagType `json:"type"`
-	KindId       int               `json:"kind_id"`
-	Name         string            `json:"name"`
-	Description  string            `json:"description"`
-	CreatedAt    time.Time         `json:"created_at"`
-	CreatedBy    string            `json:"created_by"`
-	UpdatedAt    time.Time         `json:"updated_at"`
-	UpdatedBy    string            `json:"updated_by"`
-	DeletedAt    null.Time         `json:"deleted_at"`
-	DeletedBy    null.String       `json:"deleted_by"`
-	Position     null.Int32        `json:"position"`
-	AllowCertify null.Bool         `json:"allow_certify"`
+	ID             int               `json:"id"`
+	Type           AssetGroupTagType `json:"type"`
+	KindId         int               `json:"kind_id"`
+	Name           string            `json:"name"`
+	Description    string            `json:"description"`
+	CreatedAt      time.Time         `json:"created_at"`
+	CreatedBy      string            `json:"created_by"`
+	UpdatedAt      time.Time         `json:"updated_at"`
+	UpdatedBy      string            `json:"updated_by"`
+	DeletedAt      null.Time         `json:"deleted_at"`
+	DeletedBy      null.String       `json:"deleted_by"`
+	Position       null.Int32        `json:"position"`
+	RequireCertify null.Bool         `json:"require_certify"`
 }
 
 func (AssetGroupTag) TableName() string {
@@ -61,13 +65,13 @@ func (AssetGroupTag) TableName() string {
 
 func (s AssetGroupTag) AuditData() AuditData {
 	return AuditData{
-		"id":            s.ID,
-		"type":          s.Type,
-		"kind_id":       s.KindId,
-		"name":          s.Name,
-		"description":   s.Description,
-		"position":      s.Position,
-		"allow_certify": s.AllowCertify,
+		"id":              s.ID,
+		"type":            s.Type,
+		"kind_id":         s.KindId,
+		"name":            s.Name,
+		"description":     s.Description,
+		"position":        s.Position,
+		"require_certify": s.RequireCertify,
 	}
 }
 
